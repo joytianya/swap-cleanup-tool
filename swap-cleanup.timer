@@ -1,0 +1,11 @@
+[Unit]
+Description=Run swap cleanup every 5 minutes
+Requires=swap-cleanup.service
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=5min
+Persistent=true
+
+[Install]
+WantedBy=timers.target
