@@ -29,7 +29,9 @@ sudo ./install_swap_cleanup.sh
 # 1. 复制脚本到系统目录
 sudo mkdir -p /opt/swap-cleanup-tool
 sudo cp swap_cleanup.sh /opt/swap-cleanup-tool/
+sudo cp interactive_cleanup.sh /opt/swap-cleanup-tool/
 sudo chmod +x /opt/swap-cleanup-tool/swap_cleanup.sh
+sudo chmod +x /opt/swap-cleanup-tool/interactive_cleanup.sh
 
 # 2. 安装systemd服务
 sudo cp swap-cleanup.service /etc/systemd/system/
@@ -48,6 +50,10 @@ sudo systemctl start swap-cleanup.timer
 使用交互式工具可以手动选择清理选项:
 
 ```bash
+# 如果已安装
+sudo /opt/swap-cleanup-tool/interactive_cleanup.sh
+
+# 或在项目目录直接运行
 sudo ./interactive_cleanup.sh
 ```
 
