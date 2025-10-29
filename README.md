@@ -4,9 +4,10 @@
 
 ## 文件说明
 
-- `swap_cleanup.sh` - 主脚本，负责监控swap使用率和执行清理
+- `swap_cleanup.sh` - 自动监控脚本，负责监控swap使用率和自动执行清理
+- `interactive_cleanup.sh` - 交互式内存释放工具，支持手动选择清理选项
 - `swap-cleanup.service` - systemd服务文件
-- `swap-cleanup.timer` - systemd定时器文件，每5分钟检查一次
+- `swap-cleanup.timer` - systemd定时器文件，每1分钟检查一次
 - `install_swap_cleanup.sh` - 一键安装脚本
 
 ## 部署方法
@@ -42,6 +43,26 @@ sudo systemctl start swap-cleanup.timer
 
 ## 使用方法
 
+### 交互式内存释放（推荐）
+
+使用交互式工具可以手动选择清理选项:
+
+```bash
+sudo ./interactive_cleanup.sh
+```
+
+**功能特性:**
+- 实时显示内存和Swap使用状态
+- 支持多种清理选项:
+  1. 清理页面缓存 (Page Cache)
+  2. 清理目录项和inode缓存 (Dentries & Inodes)
+  3. 清理所有缓存 (All Caches)
+  4. 清理Swap
+  5. 清理所有 (缓存 + Swap)
+  6. 显示内存状态
+- 彩色输出,清晰易读
+- 所有操作记录到日志文件
+
 ### 查看状态
 ```bash
 # 查看定时器状态
@@ -54,7 +75,7 @@ journalctl -u swap-cleanup.service
 sudo tail -f /var/log/swap_cleanup.log
 ```
 
-### 手动测试
+### 自动清理测试
 ```bash
 # 测试脚本（不执行清理）
 /opt/swap-cleanup-tool/swap_cleanup.sh --test
@@ -101,9 +122,24 @@ sudo systemctl restart swap-cleanup.timer
 - 系统日志: `journalctl -u swap-cleanup.service`
 - 应用日志: `/var/log/swap_cleanup.log`
 
+## 内存清理说明
+
+### 缓存清理 (drop_caches)
+- **选项1 (Page Cache)**: 清理页面缓存，释放文件系统缓存的内存
+- **选项2 (Dentries & Inodes)**: 清理目录项和inode缓存
+- **选项3 (All Caches)**: 清理所有缓存 (等同于 echo 3 > /proc/sys/vm/drop_caches)
+- 缓存清理是安全的，Linux会在需要时自动重建缓存
+
+### Swap清理
+- 通过 `swapoff -a` 和 `swapon -a` 将Swap中的数据重新加载到内存
+- 可以释放Swap空间中的碎片化数据
+- 需要足够的物理内存支持
+
 ## 注意事项
 
-1. 清理过程中会短暂关闭swap，可能影响系统性能
-2. 确保系统有足够的物理内存支持清理过程
-3. 建议在测试环境先验证后再部署到生产环境
-4. 脚本需要root权限运行
+1. **交互式工具和所有清理操作都需要root权限**
+2. 清理Swap过程中会短暂关闭swap，可能影响系统性能
+3. 确保系统有足够的物理内存支持Swap清理过程
+4. 缓存清理是安全的，但会暂时降低文件访问性能
+5. 建议在测试环境先验证后再部署到生产环境
+6. 所有操作都会记录到 `/var/log/swap_cleanup.log`
