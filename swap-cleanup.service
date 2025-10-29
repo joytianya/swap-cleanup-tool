@@ -5,7 +5,7 @@ After=multi-user.target
 
 [Service]
 Type=oneshot
-ExecStart=/opt/swap-cleanup-tool/swap_cleanup.sh
+ExecStart=/home/zxw/projects/dev/swap-cleanup-tool/swap_cleanup.sh
 User=root
 
 [Install]

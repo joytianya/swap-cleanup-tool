@@ -1,0 +1,12 @@
+[Unit]
+Description=Cache Cleanup Service
+Documentation=man:cache_cleanup.sh
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/cache-cleanup-tool/cache_cleanup.sh
+User=root
+
+[Install]
+WantedBy=multi-user.target
