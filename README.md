@@ -1,11 +1,17 @@
-# Swap Cleanup Tool
+# 内存管理工具集 (Memory Management Toolkit)
 
-自动监控和清理swap使用率的工具，当swap使用率超过80%时自动执行清理操作。
+一套完整的Linux内存管理工具，包含自动监控和交互式管理两种模式。
+
+**主要功能:**
+- 🤖 自动监控Swap使用率，超过阈值自动清理
+- 🎯 交互式内存管理：缓存清理、Swap清理、进程管理
+- 📊 实时内存状态监控
+- 🔍 查看和终止高内存占用进程
 
 ## 文件说明
 
 - `swap_cleanup.sh` - 自动监控脚本，负责监控swap使用率和自动执行清理
-- `interactive_cleanup.sh` - 交互式内存释放工具，支持手动选择清理选项
+- `interactive_cleanup.sh` - **交互式内存管理工具**，整合了缓存清理、Swap清理和进程管理功能
 - `swap-cleanup.service` - systemd服务文件
 - `swap-cleanup.timer` - systemd定时器文件，每1分钟检查一次
 - `install_swap_cleanup.sh` - 一键安装脚本
@@ -45,9 +51,9 @@ sudo systemctl start swap-cleanup.timer
 
 ## 使用方法
 
-### 交互式内存释放（推荐）
+### 交互式内存管理（推荐）
 
-使用交互式工具可以手动选择清理选项:
+使用交互式工具进行内存管理:
 
 ```bash
 # 如果已安装
@@ -55,19 +61,62 @@ sudo /opt/swap-cleanup-tool/interactive_cleanup.sh
 
 # 或在项目目录直接运行
 sudo ./interactive_cleanup.sh
+
+# 自定义显示进程数量
+sudo ./interactive_cleanup.sh -n 50
+
+# 查看帮助
+./interactive_cleanup.sh --help
 ```
 
 **功能特性:**
-- 实时显示内存和Swap使用状态
-- 支持多种清理选项:
-  1. 清理页面缓存 (Page Cache)
-  2. 清理目录项和inode缓存 (Dentries & Inodes)
-  3. 清理所有缓存 (All Caches)
-  4. 清理Swap
-  5. 清理所有 (缓存 + Swap)
-  6. 显示内存状态
-- 彩色输出,清晰易读
+
+**系统清理:**
+- 清理页面缓存 (Page Cache)
+- 清理目录项和inode缓存 (Dentries & Inodes)
+- 清理所有缓存 (All Caches)
+- 清理Swap
+- 清理所有 (缓存 + Swap)
+
+**进程管理:**
+- 查看Top N内存占用进程 (支持自定义数量: `-n 50`)
+- 显示详细进程信息 (PID, 用户, 内存, 工作目录, 命令)
+- 单个或批量终止进程
+- 支持范围选择 (如: `1-5` 或 `1-3 7 9-11`)
+- 按PID直接终止进程
+- 显示将释放的总内存量
+
+**其他特性:**
+- 实时内存和Swap状态监控
+- 彩色输出,界面友好
 - 所有操作记录到日志文件
+- 安全确认机制
+
+**使用示例:**
+
+进入进程管理模式后:
+```
+# 终止单个进程
+1          # 终止序号1的进程
+
+# 终止多个进程
+1 3 5      # 终止序号1、3、5的进程
+
+# 终止范围内的进程
+1-5        # 终止序号1到5的所有进程
+
+# 混合使用
+1-3 7 9-11 # 终止1-3、7、9-11序号的进程
+
+# 按PID终止
+pid 12345  # 终止PID为12345的进程
+
+# 刷新列表
+r          # 刷新进程列表
+
+# 返回主菜单
+b          # 返回到主菜单
+```
 
 ### 查看状态
 ```bash
